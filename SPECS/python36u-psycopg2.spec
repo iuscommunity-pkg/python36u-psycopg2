@@ -1,128 +1,45 @@
-%global srcname	psycopg2
-%global sum	A PostgreSQL database adapter for Python
-%global desc	Psycopg is the most popular PostgreSQL adapter for the Python \
-programming language. At its core it fully implements the Python DB \
-API 2.0 specifications. Several extensions allow access to many of the \
-features offered by PostgreSQL.
+%global srcname psycopg2
 
-%if 0%{?fedora} > 12
-%global with_python3 1
-%endif
-
-%if 0%{?with_python3}
-%global python_runtimes	python python-debug python3 python3-debug
-%else
-%global python_runtimes	python python-debug
-%endif # with_python3
-
-
-# Python 2.5+ is not supported by Zope, so it does not exist in
-# recent Fedora releases. That's why zope subpackage is disabled.
-%global zope 0
-%if %zope
-%global ZPsycopgDAdir %{_localstatedir}/lib/zope/Products/ZPsycopgDA
-%endif
-
-
-Summary:	%{sum}
-Name:		python-%{srcname}
-Version:	2.6.2
-Release:	4%{?dist}
+Summary:        A PostgreSQL database adapter for Python
+Name:           python36u-%{srcname}
+Version:        2.6.2
+Release:        1.ius%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
-License:	LGPLv3+ with exceptions
-Group:		Applications/Databases
-Url:		http://www.psycopg.org/psycopg/
+License:        LGPLv3+ with exceptions
+Group:          Applications/Databases
+URL:            http://initd.org/psycopg/
+Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-6/psycopg2-%{version}.tar.gz
+Patch0:         remove-tests.patch
 
-Source0:	http://www.psycopg.org/psycopg/tarballs/PSYCOPG-2-6/psycopg2-%{version}.tar.gz
+BuildRequires:  postgresql-devel
+BuildRequires:  python36u-devel
+BuildRequires:  python-sphinx
 
-BuildRequires:	postgresql-devel
-BuildRequires:	python-devel
-BuildRequires:	python-debug
-%if 0%{?with_python3}
-BuildRequires:	python3-devel
-BuildRequires:	python3-debug
-%endif # with_python3
-BuildRequires:	python-sphinx
-
-Conflicts:	python-psycopg2-zope < %{version}
 
 %description
-%{desc}
-
-
-%package -n python2-%{srcname}
-%{?python_provide:%python_provide python2-%{srcname}}
-Summary: %{sum} 2
-
-%description -n python2-%{srcname}
-%{desc}
-
-
-%package -n python2-%{srcname}-debug
-Summary: A PostgreSQL database adapter for Python 2 (debug build)
-# Require the base package, as we're sharing .py/.pyc files:
-Requires:	%{name} = %{version}-%{release}
-%{?python_provide:%python_provide python2-%{srcname}-debug}
-
-%description -n python2-%{srcname}-debug
-This is a build of the psycopg PostgreSQL database adapter for the debug
-build of Python 2.
-
-
-%if 0%{?with_python3}
-%package -n python3-psycopg2
-Summary: %{sum} 3
-%{?python_provide:%python_provide python3-%{srcname}}
-
-%description  -n python3-psycopg2
-%{desc}
-
-
-%package -n python3-psycopg2-debug
-Summary: A PostgreSQL database adapter for Python 3 (debug build)
-# Require base python 3 package, as we're sharing .py/.pyc files:
-Requires:	python3-psycopg2 = %{version}-%{release}
-
-%description -n python3-%{srcname}-debug
-This is a build of the psycopg PostgreSQL database adapter for the debug
-build of Python 3.
-%endif # with_python3
+Psycopg is the most popular PostgreSQL adapter for the Python programming
+language. At its core it fully implements the Python DB API 2.0 specifications.
+Several extensions allow access to many of the features offered by PostgreSQL.
 
 
 %package doc
-Summary:	Documentation for psycopg python PostgreSQL database adapter
-Group:		Documentation
-Requires:	%{name} = %{version}-%{release}
-Provides:	python2-%{srcname}-doc = %{version}-%{release}
-Provides:	python3-%{srcname}-doc = %{version}-%{release}
+Summary:        Documentation for psycopg python PostgreSQL database adapter
+Group:          Documentation
+Requires:       %{name} = %{version}-%{release}
+
 
 %description doc
 Documentation and example files for the psycopg python PostgreSQL
 database adapter.
 
 
-%if %zope
-%package zope
-Summary:	Zope Database Adapter ZPsycopgDA
-# The exceptions allow linking to OpenSSL and PostgreSQL's libpq
-License:	GPLv2+ with exceptions or ZPLv1.0
-Group:		Applications/Databases
-Requires:	%{name} = %{version}-%{release}
-Requires:	zope
-
-%description zope
-Zope Database Adapter for PostgreSQL, called ZPsycopgDA
-%endif
-
-
 %prep
-%setup -q -n psycopg2-%{version}
+%autosetup -n psycopg2-%{version}
+rm -r tests
 
 
 %build
-for python in %{python_runtimes} ; do
-  $python setup.py build
-done
+%{py36_build}
 
 # Fix for wrong-file-end-of-line-encoding problem; upstream also must fix this.
 for i in `find doc -iname "*.html"`; do sed -i 's/\r//' $i; done
@@ -135,60 +52,13 @@ make -C doc/src html
 
 
 %install
-DoInstall() {
-  PythonBinary=$1
-
-  Python_SiteArch=$($PythonBinary -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")
-
-  mkdir -p %{buildroot}$Python_SiteArch/psycopg2
-  $PythonBinary setup.py install --no-compile --root %{buildroot}
-
-  # We're not currently interested in packaging the test suite.
-  rm -rf %{buildroot}$Python_SiteArch/psycopg2/tests
-}
-
-for python in %{python_runtimes} ; do
-  DoInstall $python
-done
-
-%if %zope
-install -d %{buildroot}%{ZPsycopgDAdir}
-cp -pr ZPsycopgDA/* %{buildroot}%{ZPsycopgDAdir}
-%endif
+%{py36_install}
 
 
-%files -n python2-psycopg2
+%files
 %license LICENSE
 %doc AUTHORS NEWS README.rst
-%dir %{python2_sitearch}/psycopg2
-%{python2_sitearch}/psycopg2/*.py
-%{python2_sitearch}/psycopg2/*.pyc
-%{python2_sitearch}/psycopg2/_psycopg.so
-%{python2_sitearch}/psycopg2/*.pyo
-%{python2_sitearch}/psycopg2-%{version}-py2*.egg-info
-
-
-%files -n python2-%{srcname}-debug
-%license LICENSE
-%{python2_sitearch}/psycopg2/_psycopg_d.so
-
-
-%if 0%{?with_python3}
-%files -n python3-psycopg2
-%license LICENSE
-%doc AUTHORS NEWS README.rst
-%dir %{python3_sitearch}/psycopg2
-%{python3_sitearch}/psycopg2/*.py
-%{python3_sitearch}/psycopg2/_psycopg.cpython-3?m*.so
-%dir %{python3_sitearch}/psycopg2/__pycache__
-%{python3_sitearch}/psycopg2/__pycache__/*.py{c,o}
-%{python3_sitearch}/psycopg2-%{version}-py3*.egg-info
-
-
-%files -n python3-psycopg2-debug
-%license LICENSE
-%{python3_sitearch}/psycopg2/_psycopg.cpython-3?dm*.so
-%endif # with_python3
+%{python36_sitearch}/psycopg2*
 
 
 %files doc
@@ -196,19 +66,10 @@ cp -pr ZPsycopgDA/* %{buildroot}%{ZPsycopgDAdir}
 %doc doc examples/
 
 
-%if %zope
-%files zope
-%license LICENSE
-%dir %{ZPsycopgDAdir}
-%{ZPsycopgDAdir}/*.py
-%{ZPsycopgDAdir}/*.pyo
-%{ZPsycopgDAdir}/*.pyc
-%{ZPsycopgDAdir}/dtml/*
-%{ZPsycopgDAdir}/icons/*
-%endif
-
-
 %changelog
+* Thu Feb 23 2017 Carl George <carl.george@rackspace.com> - 2.6.2-1.ius
+- Port from Fedora to IUS
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
