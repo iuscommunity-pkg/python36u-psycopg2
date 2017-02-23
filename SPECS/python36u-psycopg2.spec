@@ -1,5 +1,7 @@
 %global srcname psycopg2
 
+%bcond_with docs
+
 Summary:        A PostgreSQL database adapter for Python
 Name:           python36u-%{srcname}
 Version:        2.6.2
@@ -13,7 +15,7 @@ Patch0:         remove-tests.patch
 
 BuildRequires:  postgresql-devel
 BuildRequires:  python36u-devel
-BuildRequires:  python-sphinx
+%{?with_foo:BuildRequires: python36u-sphinx}
 
 
 %description
@@ -22,6 +24,7 @@ language. At its core it fully implements the Python DB API 2.0 specifications.
 Several extensions allow access to many of the features offered by PostgreSQL.
 
 
+%if %{with docs}
 %package doc
 Summary:        Documentation for psycopg python PostgreSQL database adapter
 Group:          Documentation
@@ -31,6 +34,7 @@ Requires:       %{name} = %{version}-%{release}
 %description doc
 Documentation and example files for the psycopg python PostgreSQL
 database adapter.
+%endif
 
 
 %prep
@@ -41,6 +45,7 @@ rm -r tests
 %build
 %{py36_build}
 
+%if %{with docs}
 # Fix for wrong-file-end-of-line-encoding problem; upstream also must fix this.
 for i in `find doc -iname "*.html"`; do sed -i 's/\r//' $i; done
 for i in `find doc -iname "*.css"`; do sed -i 's/\r//' $i; done
@@ -49,6 +54,7 @@ for i in `find doc -iname "*.css"`; do sed -i 's/\r//' $i; done
 rm -f doc/html/.buildinfo
 
 make -C doc/src html
+%endif
 
 
 %install
@@ -61,14 +67,17 @@ make -C doc/src html
 %{python36_sitearch}/psycopg2*
 
 
+%if %{with doc}
 %files doc
 %license LICENSE
 %doc doc examples/
+%endif
 
 
 %changelog
 * Thu Feb 23 2017 Carl George <carl.george@rackspace.com> - 2.6.2-1.ius
 - Port from Fedora to IUS
+- Disable building html docs, not useful unless we build python36u-sphinx
 
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.2-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
