@@ -4,16 +4,16 @@
 
 Summary:        A PostgreSQL database adapter for Python
 Name:           python36u-%{srcname}
-Version:        2.6.2
+Version:        2.7.1
 Release:        1.ius%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:        LGPLv3+ with exceptions
 Group:          Applications/Databases
 URL:            http://initd.org/psycopg/
-Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-6/psycopg2-%{version}.tar.gz
+Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-%{version}.tar.gz
 Patch0:         remove-tests.patch
 
-BuildRequires:  postgresql-devel
+BuildRequires:  postgresql-devel > 9.1
 BuildRequires:  python36u-devel
 %{?with_foo:BuildRequires: python36u-sphinx}
 
@@ -75,6 +75,11 @@ make -C doc/src html
 
 
 %changelog
+* Tue Mar 14 2017 Ben Harper <ben.harper@rackspace.com> - 2.7.1-ius
+- Latest upstream
+- adjusted BuildRequires, client older than PostgreSQL 9.1 is not supported
+- tweaked Source0
+
 * Thu Feb 23 2017 Carl George <carl.george@rackspace.com> - 2.6.2-1.ius
 - Port from Fedora to IUS
 - Disable building html docs, not useful unless we build python36u-sphinx
