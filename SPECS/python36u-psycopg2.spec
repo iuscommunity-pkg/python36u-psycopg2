@@ -4,7 +4,7 @@
 
 Summary:        A PostgreSQL database adapter for Python
 Name:           python36u-%{srcname}
-Version:        2.7.2
+Version:        2.7.3
 Release:        1.ius%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:        LGPLv3+ with exceptions
@@ -75,7 +75,7 @@ make -C doc/src html
 
 
 %changelog
-* Mon Jul 24 2017 Ben Harper <ben.harper@rackspace.com> - 2.7.2-1.ius
+* Mon Jul 24 2017 Ben Harper <ben.harper@rackspace.com> - 2.7.3-1.ius
 - Latest upstream
 
 * Tue Mar 14 2017 Ben Harper <ben.harper@rackspace.com> - 2.7.1-ius
