@@ -4,17 +4,17 @@
 
 Summary:        A PostgreSQL database adapter for Python
 Name:           python36u-%{srcname}
-Version:        2.7.7
+Version:        2.8.2
 Release:        1.ius%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:        LGPLv3+ with exceptions
 Group:          Applications/Databases
 URL:            http://initd.org/psycopg/
-Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-%{version}.tar.gz
-Patch0:         remove-tests.patch
+Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-8/psycopg2-%{version}.tar.gz
 
 BuildRequires:  postgresql-devel > 9.1
 BuildRequires:  python36u-devel
+BuildRequires:  python36u-setuptools
 %{?with_docs:BuildRequires: python36u-sphinx}
 
 
@@ -75,6 +75,9 @@ make -C doc/src html
 
 
 %changelog
+* Thu Apr 25 2019 evitalis <evitalis@users.noreply.github.com> - 2.8.2-1.ius
+- Latest upstream
+
 * Sun Mar 17 2019 evitalis <evitalis@users.noreply.github.com> - 2.7.7-1.ius
 - Latest upstream
 
