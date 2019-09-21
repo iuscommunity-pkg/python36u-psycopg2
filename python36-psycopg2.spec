@@ -1,5 +1,10 @@
 %global srcname psycopg2
 
+%global common_description %{expand:
+Psycopg is the most popular PostgreSQL adapter for the Python programming
+language. At its core it fully implements the Python DB API 2.0 specifications.
+Several extensions allow access to many of the features offered by PostgreSQL.}
+
 %if %{defined el6}
 %global __python3 /usr/bin/python3.6
 %endif
@@ -13,8 +18,6 @@ Release:        2%{?dist}
 License:        LGPLv3+ with exceptions
 URL:            http://initd.org/psycopg/
 Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-%{version}.tar.gz
-Patch0:         remove-tests.patch
-
 BuildRequires:  postgresql-devel > 9.1
 BuildRequires:  gcc
 BuildRequires:  python36-devel
@@ -29,15 +32,21 @@ Obsoletes: python36u-%{srcname} < 2.7.4-2
 Obsoletes: python36u-%{srcname}-doc < 2.7.4-2
 
 
-%description
-Psycopg is the most popular PostgreSQL adapter for the Python programming
-language. At its core it fully implements the Python DB API 2.0 specifications.
-Several extensions allow access to many of the features offered by PostgreSQL.
+%description %{common_description}
+
+
+%package tests
+Summary:        Test suite for python36-%{srcname}
+Requires:       python36-%{srcname} = %{version}-%{release}
+
+
+%description tests %{common_description}
+
+This sub-package delivers set of tests for the adapter.
 
 
 %prep
 %autosetup -n %{srcname}-%{version}
-rm -r tests
 # delete shebangs
 find -name \*.py | xargs sed -i -e '1 {/^#!/d}'
 
@@ -54,12 +63,18 @@ find -name \*.py | xargs sed -i -e '1 {/^#!/d}'
 %license LICENSE
 %doc AUTHORS NEWS README.rst
 %{python3_sitearch}/%{srcname}
+%exclude %{python3_sitearch}/%{srcname}/tests
 %{python3_sitearch}/%{srcname}-%{version}-py%{python3_version}.egg-info
+
+
+%files tests
+%{python3_sitearch}/%{srcname}/tests
 
 
 %changelog
 * Sat Sep 21 2019 Carl George <carl@george.computer> - 2.7.7-2
 - Update to 2.7.7 and bump release higher than EPEL
+- Add tests subpackage
 
 * Sat Sep 21 2019 Carl George <carl@george.computer> - 2.7.4-2
 - Rename to python36-setuptools
