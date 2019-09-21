@@ -1,5 +1,9 @@
 %global srcname psycopg2
 
+%if %{defined el6}
+%global __python3 /usr/bin/python3.6
+%endif
+
 %bcond_with docs
 
 Summary:        A PostgreSQL database adapter for Python
@@ -43,12 +47,12 @@ database adapter.
 
 
 %prep
-%autosetup -n psycopg2-%{version}
+%autosetup -n %{srcname}-%{version}
 rm -r tests
 
 
 %build
-%{py36_build}
+%py3_build
 
 %if %{with docs}
 # Fix for wrong-file-end-of-line-encoding problem; upstream also must fix this.
@@ -63,13 +67,14 @@ make -C doc/src html
 
 
 %install
-%{py36_install}
+%py3_install
 
 
 %files
 %license LICENSE
 %doc AUTHORS NEWS README.rst
-%{python36_sitearch}/psycopg2*
+%{python3_sitearch}/%{srcname}
+%{python3_sitearch}/%{srcname}-%{version}-py%{python3_version}.egg-info
 
 
 %if %{with doc}
@@ -82,6 +87,7 @@ make -C doc/src html
 %changelog
 * Sat Sep 21 2019 Carl George <carl@george.computer> - 2.7.4-2
 - Rename to python36-setuptools
+- Switch to EPEL python3 macros
 
 * Thu Feb 08 2018 Ben Harper <ben.harper@rackspace.com> - 2.7.4-1.ius
 - Latest upstream
