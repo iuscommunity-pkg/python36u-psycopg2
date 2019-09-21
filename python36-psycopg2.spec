@@ -12,7 +12,6 @@ Version:        2.7.4
 Release:        2%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:        LGPLv3+ with exceptions
-Group:          Applications/Databases
 URL:            http://initd.org/psycopg/
 Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-%{version}.tar.gz
 Patch0:         remove-tests.patch
@@ -36,7 +35,6 @@ Several extensions allow access to many of the features offered by PostgreSQL.
 %if %{with docs}
 %package doc
 Summary:        Documentation for psycopg python PostgreSQL database adapter
-Group:          Documentation
 Requires:       %{name} = %{version}-%{release}
 
 
