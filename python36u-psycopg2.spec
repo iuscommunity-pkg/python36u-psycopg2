@@ -5,7 +5,7 @@
 Summary:        A PostgreSQL database adapter for Python
 Name:           python36u-%{srcname}
 Version:        2.7.4
-Release:        1.ius%{?dist}
+Release:        1%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:        LGPLv3+ with exceptions
 Group:          Applications/Databases
