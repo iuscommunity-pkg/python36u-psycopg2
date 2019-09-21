@@ -5,9 +5,9 @@
 %endif
 
 
-Summary:        A PostgreSQL database adapter for Python
+Summary:        PostgreSQL database adapter for Python
 Name:           python36-%{srcname}
-Version:        2.7.4
+Version:        2.7.7
 Release:        2%{?dist}
 # The exceptions allow linking to OpenSSL and PostgreSQL's libpq
 License:        LGPLv3+ with exceptions
@@ -16,7 +16,9 @@ Source0:        http://initd.org/psycopg/tarballs/PSYCOPG-2-7/psycopg2-%{version
 Patch0:         remove-tests.patch
 
 BuildRequires:  postgresql-devel > 9.1
+BuildRequires:  gcc
 BuildRequires:  python36-devel
+BuildRequires:  python36-setuptools
 
 # Rename from python36u-psycopg2
 Provides: python36u-%{srcname} = %{version}-%{release}
@@ -36,6 +38,8 @@ Several extensions allow access to many of the features offered by PostgreSQL.
 %prep
 %autosetup -n %{srcname}-%{version}
 rm -r tests
+# delete shebangs
+find -name \*.py | xargs sed -i -e '1 {/^#!/d}'
 
 
 %build
@@ -54,6 +58,9 @@ rm -r tests
 
 
 %changelog
+* Sat Sep 21 2019 Carl George <carl@george.computer> - 2.7.7-2
+- Update to 2.7.7 and bump release higher than EPEL
+
 * Sat Sep 21 2019 Carl George <carl@george.computer> - 2.7.4-2
 - Rename to python36-setuptools
 - Switch to EPEL python3 macros
