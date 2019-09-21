@@ -4,7 +4,6 @@
 %global __python3 /usr/bin/python3.6
 %endif
 
-%bcond_with docs
 
 Summary:        A PostgreSQL database adapter for Python
 Name:           python36-%{srcname}
@@ -18,30 +17,20 @@ Patch0:         remove-tests.patch
 
 BuildRequires:  postgresql-devel > 9.1
 BuildRequires:  python36-devel
-%{?with_docs:BuildRequires: python36-sphinx}
 
 # Rename from python36u-psycopg2
 Provides: python36u-%{srcname} = %{version}-%{release}
 Provides: python36u-%{srcname}%{?_isa} = %{version}-%{release}
 Obsoletes: python36u-%{srcname} < 2.7.4-2
 
+# Removed doc subpackage
+Obsoletes: python36u-%{srcname}-doc < 2.7.4-2
+
 
 %description
 Psycopg is the most popular PostgreSQL adapter for the Python programming
 language. At its core it fully implements the Python DB API 2.0 specifications.
 Several extensions allow access to many of the features offered by PostgreSQL.
-
-
-%if %{with docs}
-%package doc
-Summary:        Documentation for psycopg python PostgreSQL database adapter
-Requires:       %{name} = %{version}-%{release}
-
-
-%description doc
-Documentation and example files for the psycopg python PostgreSQL
-database adapter.
-%endif
 
 
 %prep
@@ -51,17 +40,6 @@ rm -r tests
 
 %build
 %py3_build
-
-%if %{with docs}
-# Fix for wrong-file-end-of-line-encoding problem; upstream also must fix this.
-for i in `find doc -iname "*.html"`; do sed -i 's/\r//' $i; done
-for i in `find doc -iname "*.css"`; do sed -i 's/\r//' $i; done
-
-# Get rid of a "hidden" file that rpmlint complains about
-rm -f doc/html/.buildinfo
-
-make -C doc/src html
-%endif
 
 
 %install
@@ -75,17 +53,11 @@ make -C doc/src html
 %{python3_sitearch}/%{srcname}-%{version}-py%{python3_version}.egg-info
 
 
-%if %{with doc}
-%files doc
-%license LICENSE
-%doc doc examples/
-%endif
-
-
 %changelog
 * Sat Sep 21 2019 Carl George <carl@george.computer> - 2.7.4-2
 - Rename to python36-setuptools
 - Switch to EPEL python3 macros
+- Drop doc subpackage
 
 * Thu Feb 08 2018 Ben Harper <ben.harper@rackspace.com> - 2.7.4-1.ius
 - Latest upstream
